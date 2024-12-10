@@ -1,38 +1,437 @@
+/* General styling */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-y: auto; /* Enable vertical scrolling */
+  font-family: 'Lexend', sans-serif; /* Set Lexend as the default font */
+}
+
+/* Stars background styling */
+.stars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: url('bg.jpg') no-repeat center center;
+  background-size: cover;
+  animation: Stars 30s linear infinite;
+  z-index: -1; /* Ensure the stars are behind the content */
+}
+
+@keyframes Stars {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.stars-container span {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1),
+              0 0 0 8px rgba(255, 255, 255, 0.1),
+              0 0 0 6px rgba(255, 255, 255, 1);
+  animation: animate 5s linear infinite;
+}
+
+@keyframes animate {
+  0% { transform: rotate(315deg) translateX(0); }
+  100% { transform: rotate(315deg) translateX(-1000px); opacity: 0; }
+}
+
+.stars-container span::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 400px;
+  height: 1px;
+  background: linear-gradient(90deg, #ffffff, transparent);
+  transform: translateY(-50%);
+}
+
+.stars-container span:nth-child(1) { top: 0; right: 0; animation-delay: 0; animation-duration: 1s; }
+.stars-container span:nth-child(2) { top: 0; right: 80px; animation-delay: 0.2s; animation-duration: 3s; }
+.stars-container span:nth-child(3) { top: 80px; right: 0px; animation-delay: 0.4s; animation-duration: 2s; }
+.stars-container span:nth-child(4) { top: 0; right: 180px; animation-delay: 0.6s; animation-duration: 1.5s; }
+.stars-container span:nth-child(5) { top: 0; right: 400px; animation-delay: 0.8s; animation-duration: 2.5s; }
+.stars-container span:nth-child(6) { top: 0; right: 600px; animation-delay: 1s; animation-duration: 3s; }
+
+/* App container */
 .App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Credits display */
+.credits-display {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-size: 16px;
+  color: #FFF;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+  z-index: 2;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Button styling */
+.button {
+  margin: 10px;
+  padding: 15px 40px;
+  border: none;
+  outline: none;
+  color: #FFF; /* White text */
+  cursor: pointer;
+  border-radius: 12px;
+  background-color: #333; /* Dark background */
+  font-size: 16px;
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transitions */
+  position: relative;
+  z-index: 1;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.button.clicked {
+  background-color: #555; /* More pronounced background change */
+  transform: scale(0.90); /* Scale down more */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 255, 255, 0.3); /* Deep shadow effect */
+}
+
+.button:active {
+  transform: scale(0.90); /* Maintain the scale down effect when pressed */
+}
+
+/* App.css */
+.quote {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out; /* Adjust the duration and timing function as desired */
+}
+
+.quote-enter {
+  opacity: 0;
+}
+
+.quote-enter-active {
+  opacity: 1;
+}
+
+
+/* Loading spinner */
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-top: 20px; /* Add some space above */
+}
+
+.loading {
+  border: 16px solid #f3f3f3; /* Light border */
+  border-top: 16px solid #3498db; /* Blue top border */
+  border-radius: 50%; /* Circular shape */
+  width: 60px; /* Spinner size */
+  height: 60px; /* Spinner size */
+  animation: spin 1s linear infinite; /* Apply spin animation */
+}
+
+/* Keyframes for spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Loading message */
+.loading-message {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 10%; /* Circular shape */
+  font-size: 16px; /* Font size for loading message */
+  color: #FFF; /* Loading message color */
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Shadow effect for the loading message */
+  background-color: #1a1a1a; /* Dark background */
+}
+
+/* Button styling */
+.button-styling {
+  background-color: #1a1a1a; /* Dark background */
+  color: #ffffff; /* Your specified color */
+  border: none; /* No border */
+  border-radius: 8px; /* Rounded corners */
+  padding: 12px 20px; /* Spacing */
+  font-size: 16px; /* Font size */
+  font-weight: 600; /* Slightly bolder text */
+  cursor: pointer; /* Pointer on hover */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+}
+
+.button-styling:hover {
+  background-color: #333; /* Slightly lighter on hover */
+  transform: translateY(-2px); /* Lift effect */
+}
+
+.button-styling:active {
+  transform: translateY(0); /* No lift when active */
+}
+
+textarea {
+  color: #000000; /* Text color */
+  font-family: 'Lexend', sans-serif; /* Apply Lexend font */
+  font-size: 16px; /* Font size */
+  padding: 12px; /* Spacing inside textarea */
+  border: 1px solid #ff0000; /* Border color */
+  border-radius: 8px; /* Rounded corners */
+  resize: none; /* Disable resizing */
+  outline: none; /* Remove outline on focus */
+  transition: border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+  width: 100%; /* Full width */
+}
+
+textarea::placeholder {
+  color: rgba(0, 0, 0, 0.5); /* Placeholder color */
+  opacity: 1; /* Make sure the placeholder is fully visible */
+}
+
+textarea:focus {
+  border-color: #000000; /* Keep border color on focus */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* Subtle shadow effect */
+}
+
+.button-child {
+  margin: 5px; /* Smaller margin than the parent button */
+  padding: 10px 20px; /* Reduced padding */
+  border: none;
+  outline: none;
+  color: #FFF; /* White text */
+  cursor: pointer;
+  border-radius: 8px; /* Slightly smaller border radius */
+  background-color: #444; /* Slightly lighter background */
+  font-size: 14px; /* Smaller font size */
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+  position: relative;
+  z-index: 1;
+}
+
+.button-child:hover {
+  background-color: #555; /* Lighter background on hover */
+}
+
+.button-child:focus {
+  outline: none; /* Remove focus outline */
+}
+
+.button-child.clicked {
+  background-color: #666; /* Change color when clicked */
+  transform: scale(0.95); /* Scale down effect */
+}
+
+.response-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+.response-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: none; /* Prevent resizing */
+  font-family: 'Courier New', Courier, monospace; /* Monospace font for code */
+}
+
+.copy-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #000000a7;
   color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
 }
 
-.App-link {
-  color: #61dafb;
+.copy-button:hover {
+  background-color: #0000004f;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.content-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+}
+
+/* Chat Bar */
+.chat-bar {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: #ffffff; /* Light background for chat bar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+/* Chat Input */
+.chat-input {
+  flex: 1; /* Take up remaining space */
+  border: none;
+  outline: none; /* Remove outline on focus */
+  padding: 12px; /* Consistent padding */
+  border-radius: 20px; /* Rounded corners */
+  font-size: 16px; /* Font size */
+  background-color: #f8f9fa; /* Light background */
+  color: #333; /* Dark text color */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle inner shadow */
+  transition: box-shadow 0.3s; /* Smooth transition */
+}
+
+/* Chat Input Focus State */
+.chat-input:focus {
+  box-shadow: 0 0 5px rgba(65, 65, 65, 0.5); /* Highlight on focus */
+}
+
+/* Send Button */
+.send-button {
+  background-color: #000000; /* Primary button color */
+  color: white;
+  border: none;
+  border-radius: 50%; /* Circular shape */
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  padding: 0; /* Remove padding */
+  margin-left: 10px; /* Spacing between input and button */
+  cursor: pointer;
+  font-size: 20px; /* Font size for the icon */
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+  display: flex; /* Flex for centering icon */
+  align-items: center; /* Center icon vertically */
+  justify-content: center; /* Center icon horizontally */
+  transition: background-color 0.3s; /* Smooth transition */
+}
+
+.send-button:hover {
+  background-color: #000000; /* Darker shade on hover */
+}
+
+.send-button:disabled {
+  background-color: #ccc; /* Grey out when disabled */
+  cursor: not-allowed; /* Change cursor */
+}
+
+.response-content {
+  margin-top: 20px;
+}
+
+.response-textarea {
+  width: 100%;
+  resize: none;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for the response area */
+  font-family: 'Lexend', sans-serif; /* Ensure Lexend is applied */
+}
+
+.images-container {
+  display: flex;
+  flex-direction: column; /* Stack images vertically */
+  align-items: center; /* Center images */
+}
+
+.generated-image {
+  width: 100%;
+  max-width: 1024px; /* Limit max width */
+  margin: 10px 0; /* Space between images */
+}
+
+.tooltip {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 10; /* Ensure it's above other content */
+  margin-top: 5px; /* Small gap from the credits display */
+  left: 85%;
+  top: 10%;
+  transform: translate(-50%, 0); /* Center tooltip horizontally */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Optional: Make sure the tooltip doesn't overflow the viewport */
+@media (max-width: 600px) {
+  .tooltip {
+    left: 10%; /* Adjust for smaller screens */
+    transform: none; /* Reset centering */
+    width: calc(80% - 20px); /* Make it responsive */
   }
-  to {
-    transform: rotate(360deg);
-  }
+}
+
+.expired-credits-message {
+  color: red; /* Change to whatever color you prefer */
+  margin-top: 10px; /* Adjust spacing as needed */
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Higher than any other elements */
+}
+
+.modal-content {
+  position: relative; /* Set relative position to anchor the close button */
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  z-index: 1001; /* To ensure it's above the overlay */
+  max-width: 400px;
+  width: 80%;
+}
+
+.close-button {
+  position: absolute; /* Absolute positioning within modal-content */
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333; /* Dark color for visibility */
+  cursor: pointer;
+  transition: transform 0.2s ease; /* Add subtle hover effect */
+}
+
+.close-button:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+  color: #ff0000; /* Change color to red on hover */
 }

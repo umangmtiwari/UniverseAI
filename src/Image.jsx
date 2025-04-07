@@ -24,7 +24,7 @@ function Image({ deductCredits, imageCost}) {
     if (!inputText) return;
 
     // Deduct credits here
-    deductCredits(imageCost); // Pass the cost as an argument
+    deductCredits(imageCost);
 
     setLoading(true);
     setLoadingMessage('Loading...'); // Reset loading message

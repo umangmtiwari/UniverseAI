@@ -26,6 +26,8 @@ function App() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false); // For welcome message
   const [showCreditsModal, setShowCreditsModal] = useState(false); // For insufficient credits
   const [modalMessage, setModalMessage] = useState('');
+  const [apiLoading, setApiLoading] = useState(false); // Track API loading state
+  const [usedService, setUsedService] = useState(null); // Track the service used before credits are loaded
 
   useEffect(() => {
     // Show welcome modal 2 seconds after the page loads
@@ -47,18 +49,57 @@ function App() {
     fetchCredits();
   }, []);
 
-  const fetchCredits = async () => {
-    try {
-      const response = await fetch(`${API_DOMAIN}/api/credits`);
-      const data = await response.json();
-      setCredits(data.credits);
-      setCanGenerate(data.credits > 0);
-    } catch (error) {
-      console.error('Error fetching credits:', error);
+  useEffect(() => {
+    if (usedService == null) return;
+    if (usedService == "code" || usedService == "content") {
+      const result = handleDeductCredits(); 
+      if (!result) handleInsufficientCredits();
+      setUsedService(null);
+    }
+    else if(usedService == "image"){
+        const result = handleDeductCredits();
+        if (!result) handleInsufficientCredits();
+        setUsedService(null);
+    }
+  }, [usedService]);  // This effect will run whenever `usedService` changes
+
+  const deductCreditsForService = async (service) => {
+    if (service === 'image') {
+      await handleDeductCredits();
+    } else if (service === 'content' || service === 'code') {
+      await handleDeductCredits();
     }
   };
 
+  const fetchCredits = () => {
+    const storedCredits = parseInt(localStorage.getItem('credits'), 10);
+    const lastReset = parseInt(localStorage.getItem('lastReset'), 10);
+    const now = Date.now();
+  
+    if (!lastReset || now - lastReset > 12 * 60 * 60 * 1000) {
+      localStorage.setItem('credits', '15'); // start with 15 total
+      localStorage.setItem('lastReset', now.toString());
+      setCredits(15);
+      setCanGenerate(true);
+    } else {
+      setCredits(storedCredits || 0);
+      setCanGenerate((storedCredits || 0) > 0);
+    }
+  };  
+
   const handleModelSelection = (model) => {
+    if (apiLoading) {
+      // If API is still loading (i.e., waking up), allow usage without deducting credits
+      //setUsedService(model); // Track the selected service
+      setSelectedModel(model);
+      setInputText('');
+      setLoading(false);
+      setLoadingMessage('');
+      setClickedButton(model);
+      console.log("Used Service if API not loaded: ",usedService);
+      return;
+    }
+
     if (model === 'image' && credits < IMAGE_COST) {
       handleInsufficientCredits();
       return;
@@ -90,62 +131,23 @@ function App() {
     setModalMessage("❌ Your credits have expired or are insufficient. 😞⏳ Please try again after 12 hours. ⏰");
     setShowCreditsModal(true);
   };
+
+  
+const handleDeductCredits = (cost) => {
+  const current = parseInt(localStorage.getItem('credits'), 10) || 0;
+  if (current >= cost) {
+    const newCredits = current - cost;
+    localStorage.setItem('credits', newCredits.toString());
+    setCredits(newCredits);
+    setCanGenerate(newCredits > 0);
+    return true;
+  } else {
+    handleInsufficientCredits();
+    return false;
+  }
+};
   
 
-  const handleDeductCreditsContentCode = async () => {
-    try {
-      const response = await fetch(`${API_DOMAIN}/api/deductcreditscontentcode`);
-      const data = await response.json();
-  
-      if (data.credits !== undefined) {
-        setCredits(data.credits);
-        setCanGenerate(data.credits > 0);
-        return true; // Indicate success
-      }
-  
-      // Check if the response message indicates "Not enough time"
-      if (data.message === "Not enough time has passed to recover credits.") {
-        setModalMessage(data.message);
-        setShowCreditsModal(true);
-        return false; // Indicate failure due to insufficient time
-      }
-  
-      handleInsufficientCredits(); // If no valid credits or other issues
-      return false; // Indicate failure
-    } catch (error) {
-      console.error('Error deducting credits for content/code:', error);
-      handleInsufficientCredits();
-      return false; // Indicate failure
-    }
-  };
-  
-  const handleDeductCreditsImage = async () => {
-    try {
-      const response = await fetch(`${API_DOMAIN}/api/deductcreditsimage`);
-      const data = await response.json();
-  
-      if (data.credits !== undefined) {
-        setCredits(data.credits);
-        setCanGenerate(data.credits > 0);
-        return true; // Indicate success
-      }
-  
-      // Check if the response message indicates "Not enough time"
-      if (data.message === "Not enough time has passed to recover credits.") {
-        setModalMessage(data.message);
-        setShowCreditsModal(true);
-        return false; // Indicate failure due to insufficient time
-      }
-  
-      handleInsufficientCredits(); // If no valid credits or other issues
-      return false; // Indicate failure
-    } catch (error) {
-      console.error('Error deducting credits for image:', error);
-      handleInsufficientCredits();
-      return false; // Indicate failure
-    }
-  };
-  
   const getRandomQuote = () => {
     setFade(false); 
     setTimeout(() => {
@@ -173,20 +175,16 @@ function App() {
     <div className="App">
       <StarsBackground />
 
-      {/* Welcome Modal (shown 2 seconds after page load) */}
       {showWelcomeModal && (
         <Modal
-          message={
-            <div dangerouslySetInnerHTML={{ __html: modalMessage }}></div>
-          }
+          message={<div dangerouslySetInnerHTML={{ __html: modalMessage }}></div>}
           onClose={() => setShowWelcomeModal(false)}
         />
       )}
 
-      {/* Credits Warning Modal (shown on insufficient credits) */}
       {showCreditsModal && (
         <Modal
-          message={modalMessage} // No need for HTML here
+          message={modalMessage} 
           onClose={() => setShowCreditsModal(false)}
         />
       )}
@@ -238,32 +236,34 @@ function App() {
         )}
 
         {selectedModel === 'code' && (
-          <Code inputText={inputText} startLoading={startLoading} stopLoading={stopLoading} deductCredits={() => {
-            const result = handleDeductCreditsContentCode(); // Call API to deduct credits
-            console.log(result);
-            if (!result) handleInsufficientCredits(); // Trigger modal if credits are insufficient
-          }}
-           />
+          <Code 
+          inputText={inputText} 
+          startLoading={startLoading} 
+          stopLoading={stopLoading} 
+          deductCredits={handleDeductCredits}
+          codeContentCost={CODE_CONTENT_COST}
+        />
+        
         )}
 
         {selectedModel === 'content' && (
-          <Content inputText={inputText} startLoading={startLoading} stopLoading={stopLoading} deductCredits={() => {
-            const result = handleDeductCreditsContentCode(); // Call API to deduct credits
-            if (!result) handleInsufficientCredits(); // Trigger modal if credits are insufficient
-          }}
-           />
+          <Content 
+          inputText={inputText} 
+          startLoading={startLoading} 
+          stopLoading={stopLoading} 
+          deductCredits={handleDeductCredits}
+          codeContentCost={IMAGE_COST}
+          />
         )}
 
         {selectedModel === 'image' && (
-          <Image inputText={inputText} startLoading={startLoading} stopLoading={stopLoading} deductCredits={() => {
-            const result = handleDeductCreditsImage(); // Call API to deduct credits
-            if (!result) handleInsufficientCredits(); // Trigger modal if credits are insufficient
-          }}
-           />
-        )}
-        
-        {!canGenerate && (
-          <p></p>
+          <Image 
+          inputText={inputText} 
+          startLoading={startLoading} 
+          stopLoading={stopLoading} 
+          deductCredits={handleDeductCredits}
+          imageCost={IMAGE_COST}
+        />            
         )}
       </div>
     </div>

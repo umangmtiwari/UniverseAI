@@ -18,19 +18,13 @@ Check out the live project here: [universeai.vercel.app](https://universeai.verc
 
 - **Frontend**: React.js
 - **Styling**: CSS
-- **Backend**: API endpoints hosted on Render
-- **Credit System**: Integrated with the API for managing credits (refreshed every 12 hours).
+- **Credit System**: Implemented Credits System which is refreshed every 12 hours.
 
-## API Endpoints
+## Models Used
 
-- **Fetch Credits**: `/api/credits`  
-  Returns available credits: `{ "credits": <number> }`
-
-- **Deduct Credits (Content & Code)**: `/api/deductcreditscontentcode`  
-  Deducts credits for content or code generation.
-
-- **Deduct Credits (Image)**: `/api/deductcreditsimage`  
-  Deducts credits for image generation.
+- **Content**: `anthropic.claude-v2` – A powerful language model from Anthropic used to generate human-like written content.
+- **Code**: `anthropic.claude-v2` – Also used for code generation due to its strong programming and reasoning capabilities.
+- **Image**: `amazon.titan-image-generator-v2:0` – A text-to-image generation model from Amazon Titan that produces high-quality visuals from prompts.
 
 ## How to Run Locally
 
